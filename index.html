@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Etch-A-Sketch</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style/style.css" type="text/css">
+        <link href="https://fonts.googleapis.com/css2?family=Sansita+Swashed:wght@300;600&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class='menu'>
+            <h1>Etch-A-Sketch</h1>
+            <h3 id="mouse">Use your mouse to draw!</h3>
+            <p id="mode">Mode:</p>
+            <div class="mode">
+                <button id="changeColor">Colors</button>
+                <button id="changeBW">B&W</button>
+            </div>
+            <div class="controls">
+                <button class="premade">2 * 2</button>
+                <button class="premade">8 * 8</button>
+                <button class="premade">16 * 16</button>
+                <button class="premade">32 * 32</button>
+                <button class="premade">64 * 64</button>
+                <button id="custom">Custom</button>
+                <button id="clear">Clear</button>
+            </div>
+        </div>
+        <script>
+            // Create a main div to hold the grid
+            const container = document.createElement('div');
+            container.setAttribute('class', 'container')
+            document.body.appendChild(container);
+
+            // Color settings for the grid.
+            let color = true;
+            let blackAndWhite = false;
+
+            // Buttons to change the color.
+            const changeColor = document.getElementById('changeColor');
+            const changeBW = document.getElementById('changeBW');
+            changeColor.onclick = function() {
+                color = true;
+                blackAndWhite = false;
+                clearTheGrid();
+            }
+            changeBW.onclick = function() {
+                color = false;
+                blackAndWhite = true;
+                clearTheGrid();
+            }
+
+            // Create a premade grid.
+            const premades = document.querySelectorAll('.premade');
+            for (let i = 0; i < premades.length; i++) {
+                premades[i].addEventListener('click', ()=> {
+                    // Remove existing divs
+                    removeDivs();
+
+                    // Fill in the container.
+                    const element = parseInt(premades[i].textContent, 10) * parseInt(premades[i].textContent, 10);
+                    for (let i = 0; i < element; i++) {
+                        const div = document.createElement('div');
+                        div.setAttribute('class', 'grid');
+                        container.appendChild(div);
+                    }
+                    clearTheGrid();
+                    document.querySelector('.container').style.gridTemplateColumns = 'repeat(' + parseInt(premades[i].textContent, 10) + ' , auto)';
+                });
+            };
+
+            // Remove existing divs.
+            function removeDivs() {
+                const parent = document.querySelector('.container');
+                while (parent.firstChild) {
+                    parent.firstChild.remove();
+                }
+            }
+
+
+            // Change the pen color to colorful.
+            function changeToColor(div) {
+                let red = Math.floor(Math.random() * 255).toString(16);
+                let green = Math.floor(Math.random() * 255).toString(16);
+                let blue = Math.floor(Math.random() * 255).toString(16);
+                if (red.length == 1) {
+                    red = '0' + red;
+                };
+                if (green.length == 1) {
+                    green = '0' + green;
+                };
+                if (blue.length == 1) {
+                    blue = '0' + blue;
+                };
+                div.style.background = 'linear-gradient(#' + red + green + blue + ', #' + blue + red + green + ')';
+            };
+
+            // Change the pen color to black and white.
+            function changeToBlackAndWhite(div, red, green, blue) {
+                div.style.backgroundColor = 'rgb(' + red + ',' + green + ',' + blue +')';
+            };
+
+
+            // Clear the grid.
+            const clear = document.getElementById('clear');
+            clear.addEventListener('click', clearTheGrid);
+
+            function clearTheGrid() {
+                const divs = document.querySelectorAll('.grid');
+                for (let i = 0; i < divs.length; i++) {
+                    divs[i].style.background = '';
+                    if (blackAndWhite == true) {
+                        let red = 255;
+                        let green = 255;
+                        let blue = 255;
+                        divs[i].onmouseover = function () {
+                            changeToBlackAndWhite(divs[i], red-=25.5, green-=25.5, blue-=25.5);
+                        }
+                    } else if (color == true) {
+                        divs[i].onmouseover = function () {
+                            changeToColor(divs[i]);
+                        }
+                    }
+                }
+            }
+
+            // Make a custom grid.
+            const custom = document.getElementById('custom');
+            custom.addEventListener('click', customGrid);
+
+            function customGrid() {
+                const numOfSquares = prompt('How many squares per side? (Anything above 100 may result in bad experience.');
+                // Remove existing divs.
+                removeDivs();
+                for (let i = 0; i < numOfSquares * numOfSquares; i++) {
+                    const div = document.createElement('div')
+                    div.setAttribute('class', 'grid');
+                    container.appendChild(div);
+                }
+                document.querySelector('.container').style.gridTemplateColumns = 'repeat(' + numOfSquares + ' , auto)';
+                clearTheGrid();
+            }
+
+
+            // Initaial 16*16 grid.
+            function initialGrid() {
+                for (let i = 1; i <= 16*16; i++) {
+                    const div = document.createElement('div')
+                    div.setAttribute('class', 'grid')
+                    div.onmouseover = function() {
+                        changeToColor(div);
+                    }
+                    container.appendChild(div);
+                }
+                document.querySelector('.container').style.gridTemplateColumns = 'repeat(16, auto)';
+            }
+
+            initialGrid();
+        </script>
+    </body>
+</html>
